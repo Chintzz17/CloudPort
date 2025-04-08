@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edutech Recommendation Engine | Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="info-box">
+            <h1>Welcome to Edutech Recommendation Engine</h1>
+            <p>Empowering students worldwide with personalized course recommendations.</p>
+            <p><strong>Our Vision:</strong> Making quality education accessible to everyone, especially in rural areas.</p>
+            <p><strong>How it Works:</strong> Using AI, we analyze students' interests, skills, and learning history to recommend the best courses.</p>
+        </div>
+
+        <div class="login-box">
+            <h2>Login or Sign Up</h2>
+            <form action="{{ url_for('login') }}" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

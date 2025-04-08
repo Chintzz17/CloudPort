@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edutech Recommendations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="#" onclick="window.location.reload(true); return false;">
+                    <i class="fas fa-home"></i> Home
+                 </a></li>
+                <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <img src="{{ url_for('static', filename='images/chintan.jpg') }}" alt="Profile Picture">
+                <div>
+                    <h2>{{ user_name }}</h2>  <!-- Dynamic name from session -->
+                    <p>{{ user_email }}</p>   <!-- Dynamic email from session -->
+                </div>
+            </div>
+
+            <!-- Interest Input Section -->
+            <div class="interest-input">
+                <h1>Enter Your Area of Interest</h1>
+                <div class="input-group">
+                    <input type="text" id="interestInput" placeholder="e.g., Python, Marketing, Design">
+                    <select id="skillLevel">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                    <button id="analyzeButton">Analyze</button>
+                </div>
+            </div>
+
+            <!-- Recommended Courses Section -->
+            <div class="courses-section">
+                <h1>Recommended Courses for You</h1>
+                <div id="recommendedCourses">
+                    <p class="placeholder">Enter your interest above to see personalized recommendations</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2023 Edutech Recommendation Engine. All rights reserved.</p>
+                <div>
+                    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Handling User Input and Recommendations -->
+    <script>
+        document.getElementById('analyzeButton').addEventListener('click', async () => {
+            const interest = document.getElementById('interestInput').value.trim();
+            const level = document.getElementById('skillLevel').value;
+            const coursesSection = document.getElementById('recommendedCourses');
+
+            if (!interest) {
+                coursesSection.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter your area of interest.</div>';
+                return;
+            }
+
+            try {
+                // Show loading state
+                coursesSection.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Finding the best courses for you...</p>
+                    </div>
+                `;
+                
+                // Send request to recommendation endpoint
+                const response = await fetch('/recommend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        course: interest,
+                        level: level
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to fetch recommendations');
+                }
+
+                const data = await response.json();
+                
+                if (data.recommendations && data.recommendations.length > 0) {
+                    displayRecommendations(data.recommendations);
+                } else {
+                    coursesSection.innerHTML = '<p class="placeholder">No courses found matching your criteria. Try a different interest.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                coursesSection.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> Error: ${error.message}
+                    </div>
+                `;
+            }
+        });
+
+        function displayRecommendations(allRecommendations) {
+            const coursesSection = document.getElementById('recommendedCourses');
+            coursesSection.innerHTML = '';
+            
+            const selectedLevel = document.getElementById('skillLevel').value.toLowerCase();
+            
+            // 1. Filter courses by selected level (case-insensitive)
+            const exactMatches = allRecommendations.filter(course => 
+                course.level.toLowerCase() === selectedLevel
+            );
+            
+            // 2. Get other courses if needed
+            const otherCourses = allRecommendations.filter(course =>
+                course.level.toLowerCase() !== selectedLevel
+            );
+            
+            // 3. Combine with priority to exact matches
+            const sortedRecommendations = [...exactMatches, ...otherCourses].slice(0,10);
+            
+            // 4. Display them
+            sortedRecommendations.forEach(course => {
+                const isExactMatch = course.level.toLowerCase() === selectedLevel;
+                const matchClass = isExactMatch ? 'exact-match' : '';
+                
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <h3>${course.title}</h3>
+                    <span class="level-badge ${course.level.toLowerCase()} ${matchClass}">
+                        ${course.level}
+                        
+                    </span>
+                    <span class="relevance-score">${Math.round(course.score * 100)}% match</span>
+                    <p>This course covers fundamental concepts in ${course.title.toLowerCase()} perfect for ${course.level} learners.</p>
+                    <a href="${course.link}" class="learn-more" target="_blank">
+                        View Course <i class="fas fa-arrow-right"></i>
+                    </a>
+                `;
+                coursesSection.appendChild(courseCard);
+            });
+        }
+    </script>
+</body>
+</html>

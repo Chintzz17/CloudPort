@@ -1,0 +1,154 @@
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #2196F3, #E91E63);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; 
+}
+
+/* Container for Desktop Look */
+.container {
+    display: flex;
+    flex-direction: row; 
+    align-items: flex-start; 
+    justify-content: space-between;
+    width: 90%; 
+    max-width: 1200px; 
+    background: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    overflow-y: auto; 
+    max-height: 90vh; 
+}
+
+/* Signup Box (Left Side) */
+.signup-box, .login-box {
+    width: 50%; /* Take up half the container */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.signup-box h1, .login-box h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #ffcc00;
+    text-align: center;
+}
+
+.signup-box p, .login-box p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+.signup-box form, .login-box form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%; /* Ensure form takes full width */
+}
+
+.signup-box label, .login-box label {
+    font-size: 1em;
+    margin-bottom: 5px;
+    color: white;
+}
+
+/* Input Fields and Select Boxes */
+.signup-box input,
+.signup-box select,
+.login-box input {
+    width: 96%; /* Slightly smaller than buttons */
+    padding: 12px;
+    margin: 5px 0 15px 0;
+    border-radius: 5px;
+    border: none;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.9);
+    color: black;
+}
+
+.signup-box input:focus,
+.signup-box select:focus,
+.login-box input:focus {
+    background: white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Buttons */
+.signup-box button,
+.login-box button {
+    width: 100%; /* Full width for buttons */
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    background: #ffcc00;
+    color: black;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.signup-box button:hover,
+.login-box button:hover {
+    background: #ffa000;
+    transform: scale(1.05);
+}
+
+.signup-box p,
+.login-box p {
+    margin-top: 15px;
+    font-size: 1em;
+    text-align: center;
+    width: 100%;
+}
+
+.signup-box a,
+.login-box a {
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-box a:hover,
+.login-box a:hover {
+    text-decoration: underline;
+}
+
+/* Info Box (Right Side) */
+.info-box {
+    width: 40%; /* Take up less space than signup box */
+    text-align: left;
+    padding-left: 40px; /* Spacing between form and info */
+}
+
+.info-box h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #ffcc00;
+}
+
+.info-box p {
+    font-size: 1.2em;
+    line-height: 1.6;
+}
+
+.info-box ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.info-box ul li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}

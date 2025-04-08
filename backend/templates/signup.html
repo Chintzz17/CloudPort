@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edutech Recommendation Engine | Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <div class="signup-box">
+            <h1>Join Edutech</h1>
+            <p>Get personalized course recommendations with AI.</p>
+        
+            <form action="{{ url_for('signup') }}" method="POST">
+                <label for="full_name">Full Name:</label>
+                <input type="text" id="full_name" name="full_name" required>
+
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="employment_status">Employment Status:</label>
+                <select id="employment_status" name="employment_status">
+                    <option value="employed">Employed</option>
+                    <option value="unemployed">Unemployed</option>
+                    <option value="student">Student</option>
+                </select>
+
+                <label for="gov_id">Government ID Number:</label>
+                <input type="text" id="gov_id" name="gov_id" required>
+
+                <label for="tax_pin">Tax PIN (if applicable):</label>
+                <input type="text" id="tax_pin" name="tax_pin">
+
+                <label for="phone1">Phone Number (SIM 1):</label>
+                <input type="text" id="phone1" name="phone1" required>
+
+                <label for="phone2">Phone Number (SIM 2 - optional):</label>
+                <input type="text" id="phone2" name="phone2">
+
+                <button type="submit">Create Account</button>
+            </form>
+
+         <p>Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+        </div>
+
+        <div class="info-box">
+            <h1>Unlock Your Potential!</h1>
+            <p>Join the <strong>Edutech Recommendation Engine</strong> and take the first step towards a brighter future.</p>
+            <p><strong>Why Join Us?</strong></p>
+            <ul>
+                <li>✨ <strong>Personalized Learning:</strong> Get course recommendations tailored to your interests and skills.</li>
+                <li>🚀 <strong>Career Growth:</strong> Learn in-demand skills and stay ahead in your career.</li>
+                <li>🌍 <strong>Global Community:</strong> Connect with learners and mentors from around the world.</li>
+                <li>🎓 <strong>Quality Education:</strong> Access top-rated courses from leading institutions.</li>
+            </ul>
+            <p><strong>Ready to start your journey?</strong> Sign up now and transform your future!</p>
+        </div>
+    </div>
+
+</body>
+</html>
