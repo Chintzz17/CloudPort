@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile | Edutech</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add just these styles for the edit form */
+        .edit-form {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .edit-form h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .form-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+            margin-right: 10px;
+        }
+        .edit-profile-container {
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .change-password-btn {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .change-password-btn i {
+            margin-right: 5px;
+        }
+        .edit-profile-btn {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .cancel-btn {
+            background-color: #e0e0e0;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .edit-profile-container form > div:last-child {
+            margin-top: 30px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .edit-form {
+            width: 100%;
+            max-width: 700px; /* or whatever suits your layout */
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (keep your existing sidebar) -->
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="/dashboard"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/profile" class="active"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Profile Header (keep your existing header) -->
+                <div class="profile-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="profile-info">
+                        <h1>{{ user_info.full_name }}</h1>
+                        <p class="user-email">{{ user_info.email }}</p>
+                    </div>
+                    <div class="profile-avatar" style="position: relative; text-align: right;">
+                        <form method="POST" action="/upload_photo" enctype="multipart/form-data">
+                            {% if user_info.profile_photo %}
+                                <img src="{{ url_for('static', filename='images/' + user_info.profile_photo) }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/profile-placeholder.jpg') }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%;">
+                            {% endif %}
+                            <label for="photoUpload" class="edit-avatar-btn" title="Change Photo" style="position: absolute; bottom: 0; right: 10px; cursor: pointer;">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="photoUpload" name="profile_photo" accept="image/*" onchange="this.form.submit()" style="display: none;">
+                        </form>
+                    </div>
+                </div>
+
+            <!-- Profile Details (keep your existing details) -->
+            <div class="profile-details">
+                <div class="detail-card">
+                    <h3><i class="fas fa-id-card"></i> Personal Information</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Full Name:</span>
+                        <span class="detail-value">{{ user_info.full_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ user_info.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Employment Status:</span>
+                        <span class="detail-value">{{ user_info.employment_status }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-phone"></i> Contact Information</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Primary Phone:</span>
+                        <span class="detail-value">{{ user_info.phone1 }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Secondary Phone:</span>
+                        <span class="detail-value">{{ user_info.phone2 or 'Not provided' }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-shield-alt"></i> Government IDs</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Government ID:</span>
+                        <span class="detail-value">{{ user_info.gov_id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tax PIN:</span>
+                        <span class="detail-value">{{ user_info.tax_pin or 'Not provided' }}</span>
+                    </div>
+                </div>
+
+                <!-- Edit Form (single form version) -->
+                <div class="edit-form" id="editForm">
+                    <h3>Edit Profile</h3>
+                    <form method="POST" action="/profile">
+                        <div class="form-group">
+                            <label>Full Name:</label>
+                            <input type="text" name="full_name" value="{{ user_info.full_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Employment Status:</label>
+                            <input type="text" name="employment_status" value="{{ user_info.employment_status }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Primary Phone:</label>
+                            <input type="tel" name="phone1" value="{{ user_info.phone1 }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Secondary Phone:</label>
+                            <input type="tel" name="phone2" value="{{ user_info.phone2 or '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Government ID:</label>
+                            <input type="text" name="gov_id" value="{{ user_info.gov_id }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax PIN:</label>
+                            <input type="text" name="tax_pin" value="{{ user_info.tax_pin or '' }}">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="hideEditForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="edit-profile-btn" onclick="showEditForm()"><i class="fas fa-edit"></i> Edit Profile</button>
+                    <button class="change-password-btn"><i class="fas fa-lock"></i> Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEditForm() {
+            document.getElementById('editForm').style.display = 'block';
+            document.querySelector('.edit-profile-btn').style.display = 'none';
+            window.scrollTo({
+                top: document.getElementById('editForm').offsetTop - 20,
+                behavior: 'smooth'
+            });
+        }
+        
+        function hideEditForm() {
+            document.getElementById('editForm').style.display = 'none';
+            document.querySelector('.edit-profile-btn').style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>

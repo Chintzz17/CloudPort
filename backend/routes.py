@@ -93,3 +93,19 @@ def logout():
     session.pop('user', None)
     flash("You have been logged out.", "info")
     return redirect(url_for('main_bp.login'))
+
+@main_bp.route('/profile')
+def profile():
+    if 'user_email' not in session:
+        flash("Please log in to view your profile.", "warning")
+        return redirect(url_for('main_bp.login'))
+    
+    users = load_users()
+    user_email = session['user_email']
+    
+    if user_email not in users:
+        flash("User not found.", "error")
+        return redirect(url_for('main_bp.logout'))
+    
+    return render_template('profile.html', 
+                         user_info=users[user_email])

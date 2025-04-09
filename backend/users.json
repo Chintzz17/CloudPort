@@ -1,10 +1,19 @@
 {
     "chintan123@gmail.com": {
-        "full_name": "Chintan",
-        "password": "chintan123"
+        "full_name": "Chintan Chauhan",
+        "password": "chintan123",
+        "employment_status": "Employed",
+        "gov_id": "1234",
+        "tax_pin": "4321",
+        "phone1": "1234567890",
+        "phone2": "2345678901"
     },
     "priyank123@gmail.com": {
         "full_name": "Priyank",
         "password": "priyank1234"
+    },
+    "jaydeep123@gmail.com": {
+        "full_name": "Jaydeep Vaghela",
+        "password": "jdboom"
     }
 }

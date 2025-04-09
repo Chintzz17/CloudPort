@@ -3,6 +3,10 @@ import json
 import logging
 from flask import Flask, redirect, url_for, request, flash, session, render_template, jsonify
 from recommendation_engine import RecommendationEngine  # New import
+from werkzeug.utils import secure_filename
+
+# Configure upload folder
+
 
 def create_app():
     """Initialize the Flask application with configurations and routes."""
@@ -19,6 +23,16 @@ def create_app():
 
     # Construct the absolute path to users.json
     USERS_FILE = os.path.join(BASE_DIR, 'users.json')
+
+    UPLOAD_FOLDER = 'static/images'
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB limit
+
+    def allowed_file(filename):
+        return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     # Log the path to users.json
     logging.info(f"Loading users from: {USERS_FILE}")
@@ -71,19 +85,26 @@ def create_app():
             full_name = request.form.get('full_name')
             email = request.form.get('email')
             password = request.form.get('password')
+            employment_status = request.form.get('employment_status')
+            gov_id = request.form.get('gov_id')
+            tax_pin = request.form.get('tax_pin')
+            phone1 = request.form.get('phone1')
+            phone2 = request.form.get('phone2')
 
-            # Load existing users
             users = load_users()
 
-            # Check if the email is already registered
             if email in users:
                 flash('Email already registered. Please log in.', 'error')
                 return redirect(url_for('login'))
 
-            # Save the new user
             users[email] = {
                 "full_name": full_name,
                 "password": password,
+                "employment_status": employment_status,
+                "gov_id": gov_id,
+                "tax_pin": tax_pin,
+                "phone1": phone1,
+                "phone2": phone2
             }
             save_users(users)
 
@@ -133,7 +154,47 @@ def create_app():
         session.pop('user_email', None)
         flash('You have been logged out.', 'success')
         return redirect(url_for('login'))
-
+    
+    @app.route('/profile', methods=['GET', 'POST'])
+    def profile():
+        if 'user_email' not in session:
+            flash('Please log in to view your profile.', 'error')
+            return redirect(url_for('login'))
+        
+        users = load_users()
+        user_email = session['user_email']
+        
+        if user_email not in users:
+            flash('User not found.', 'error')
+            return redirect(url_for('logout'))
+        
+        if request.method == 'POST':
+            # Handle file upload
+            if 'profile_photo' in request.files:
+                file = request.files['profile_photo']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(f"{user_email}_{file.filename}")
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    users[user_email]['profile_photo'] = filename
+            
+            # Update other profile info
+            users[user_email].update({
+                "full_name": request.form.get('full_name'),
+                "employment_status": request.form.get('employment_status'),
+                "phone1": request.form.get('phone1'),
+                "phone2": request.form.get('phone2'),
+                "gov_id": request.form.get('gov_id'),
+                "tax_pin": request.form.get('tax_pin')
+            })
+            
+            save_users(users)
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('profile'))
+        
+        # Add email to user_info for display
+        user_info = users[user_email]
+        user_info['email'] = user_email
+        return render_template("profile.html", user_info=user_info)
     return app
 
 if __name__ == "__main__":
